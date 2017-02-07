@@ -1,0 +1,95 @@
+
+red circle
+place at x,y = 80, 144
+w 80 x h 34
+
+button
+place at x,y = 84, 184
+w 77 x h 41
+
+needle center point
+(120, 170)
+
+needle straight up top position
+(120, 90)
+
+needle length = 80
+needle width = 4 is enough
+
+needle color:
+(200, 160, 160)
+
+red circle's color:
+(180, 140, 140)
+
+note name color:
+(220, 180, 180)
+
+Hz number color:
+(170, 150, 150)
+
+note name coord:
+(34, 22)
+
+sharp-flat coord:
+(70, 22)
+
+Hz number coord:
+(92, 54)
+
+each button size:
+(54, 39)
+
+button clickable boundary:
+(5,5) - (45, 32)
+
+menu button coord:
+(71, 185)
+
+power button coord:
+(126, 185)
+
+nbeats button coord:
+(42, 21)
+
+tap button coord:
+(56, 21)
+NEW - (96, 21)
+
+play button coord:
+(136, 21)
+NEW - (150, 21)
+
+blinker coord:
+(48, 159)
+NEW - (36, 157)
+
+slider bar coord:
+(60, 167)
+NEW - (74, 168)
+NEW - (64, 166)
+
+slider bar size:
+(121, 3)
+
+slider handle coord (relative to bar):
+(0, -8) to (96, -8)
+
+slider handle size:
+(25, 20)
+
+tempo down button coord:
+(152, 152)
+
+tempo down size:
+
+tempo down clickable:
+(5,4) - (29,25)
+
+tempo up button coord:
+(183, 152)
+
+tempo up button size:
+
+tempo up clickable:
+(1,4) - (24, 25)
