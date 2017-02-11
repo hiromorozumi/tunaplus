@@ -1,0 +1,1 @@
+windres tunaplus.rc -O coff -o tunaplus.res

@@ -37,6 +37,10 @@ int Audio::audioCallback(
 			in++; // advance pointer
 			writePos++;
 			capturedLen++;
+			
+			// prevent from playing unwanted noise
+			*out = 0;
+			out++;
 		}
 	}
 	else if(currentMode == METRONOME_MODE)
@@ -60,8 +64,10 @@ void Audio::initialize()
 	captured.clear();
 	int val = 0;
 	
-	for(int i=0; i<RECORDER_BUFFER_SIZE; i++)
-		captured.push_back(val);
+	captured.resize(RECORDER_BUFFER_SIZE);
+	std::fill(captured.begin(), captured.end(), 0);
+	// for(int i=0; i<RECORDER_BUFFER_SIZE; i++)
+	//	captured.push_back(val);
 
 	errorRaised = false;
 	err = Pa_Initialize();

@@ -14,14 +14,16 @@ Pitch::Pitch()
 
 void Pitch::initialize()
 {
+	audioInBoostFactor = 1.0;
 	semitoneRatio = pow(2.0, 1.0/12.0);
-	middleC = 220.0 * pow(semitoneRatio, 3.0); // middle C is C4
+	referencePitch = 440.0;
+	middleC = (referencePitch/2.0) * pow(semitoneRatio, 3.0); // middle C is C4
 	cZero = middleC * pow(0.5, 4.0);
-	buildFreqencyTable(); // used for looking up frequency of a given musical note
+	buildFrequencyTable(referencePitch); // used for looking up frequency of a given musical note
 	
 	currentFrequency = 0;
 	currentPeakAmplitude = 0;
-	thresholdAmplitude = 800;
+	thresholdAmplitude = BASE_THRESHOLD_AMPLITUDE;
 	currentNoteNumberDouble = 0;
 	currentNoteDeltaPercent = 0;
 	
@@ -56,6 +58,22 @@ void Pitch::bindAudio(Audio* r)
 	audio = r;
 }
 
+// gives 'software boost' for audio input
+void Pitch::setAudioInBoostFactor(double factor)
+{
+	audioInBoostFactor = factor;
+	double thresholdAdjFactor = ((audioInBoostFactor - 1.0) * 0.017) + 1.0;
+	thresholdAmplitude = BASE_THRESHOLD_AMPLITUDE * thresholdAdjFactor; // threshold adjusted acoordingly
+	
+	// DEBUG
+	cout << "amp threshold is now: " << thresholdAmplitude << endl;
+}
+
+double Pitch::getAudioInBoostFactor()
+{
+	return audioInBoostFactor;
+}
+
 double Pitch::detect()
 {
 	// first get the peak amplitude
@@ -63,7 +81,7 @@ double Pitch::detect()
 	for(int i=0; i<audio->captured.size(); i++)
 	{
 		if(abs(audio->captured[i])>peakAmp)
-			peakAmp = abs(audio->captured[i]);
+			peakAmp = (abs(audio->captured[i]) * audioInBoostFactor);
 	}
 	currentPeakAmplitude = (double)peakAmp / 100000;
 	
@@ -74,7 +92,7 @@ double Pitch::detect()
 		if(i>=capturedSize)
 			in[i][0] = 0; // zero pad..
 		else
-			in[i][0] = (double)audio->captured[i];
+			in[i][0] = ((double)audio->captured[i] * audioInBoostFactor);
 	}
 	
 	// now perform fft!
@@ -223,7 +241,8 @@ double Pitch::detect()
 	int indexAtClosest = 0;
 	for(int i=0;i<108;i++)
 	{
-		double tempDiviation = abs(peakFrequency - noteToFrequency(i));
+		// double tempDiviation = abs(peakFrequency - noteToFrequency(i));
+		double tempDiviation = abs(peakFrequency - frequencyTable[i]);
 		if(tempDiviation < diviationAtClosest)
 		{
 			diviationAtClosest = tempDiviation;
@@ -234,7 +253,7 @@ double Pitch::detect()
 	currentNoteNumber = indexAtClosest;
 	currentNoteCenterFrequency = frequencyTable[currentNoteNumber];
 	currentNoteName = noteToString(currentNoteNumber);
-	currentFreqencyDelta = peakFrequency - noteToFrequency(indexAtClosest);
+	currentFreqencyDelta = peakFrequency - frequencyTable[indexAtClosest];
 	
 	// store the result, return the result
 	currentFrequency = peakFrequency;
@@ -257,12 +276,16 @@ double Pitch::tau(double x)
 	return (1.0/4.0 * p1 - sqrt(6) / 24 * p2);
 }
 
-void Pitch::buildFreqencyTable()
+void Pitch::buildFrequencyTable(double refPitch)
 {
+	referencePitch = refPitch;
+	middleC = (refPitch/2.0) * pow(semitoneRatio, 3.0); // middle C is C4
+	cZero = middleC * pow(0.5, 4.0);
 	for(int i=0;i<108;i++)
 	{
 		frequencyTable[i] = noteToFrequency(i);
 	}
+	cout << "Frequency table rebuilt! Based on A=" << refPitch << endl;
 }
 
 double Pitch::noteToFrequency(int noteNum)

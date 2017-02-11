@@ -93,3 +93,30 @@ tempo up button size:
 
 tempo up clickable:
 (1,4) - (24, 25)
+
+setup button coord:
+(71, 38)
+NEW y = 21
+
+help button coord:
+(125, 38) 
+NEW y = 21
+
+"reference pitch" text coord:
+(66, 103)
+NEW (subtract 26 from y)
+
+"440" text coord:
+(159, 124)
+NEW (subtract 26 from y)
+
+ref. pitch slider coord:
+(66, 130)
+NEW (subtract 26 from y)
+
+"Audio-in boost" text coord:
+
+"100" text coord:
+
+ref. pitch slider coord:
+use y = 156

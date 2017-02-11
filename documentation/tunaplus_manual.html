@@ -1,0 +1,88 @@
+<head>
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+
+
+<body>
+
+<div id="title">
+	<div class="narrow">
+		<h1>Tuna+</h1>
+
+		<p id="title_paragraph">
+		Tuna+ is a little suite of helpful desktop tools to assist musicians. Currently, it comes with an instrument tuner and a metronome. More tools will be added soon! Enjoy :)
+		</p>
+</div>
+</div>
+
+<div id="tuner_mode">
+	<div class="narrow">
+
+	<h2>Tuner Mode</h2>
+		<img src="tuner_mode.png" id="tuner_mode_png" />
+	<div class="clear"></div>	
+	<div id="tuner_states_table">
+	<table cellspacing="" cellpadding="0">
+		<tr>
+			<td><img src="too_low.png" class="table_image_pad_right" /></td><td><p>... Too low, tune up</p></td>
+		</tr>
+		<tr>
+			<td><img src="in_tune.png" class="table_image_pad_right"/></td><td><p>... Right on, you're in tune!</p></td>
+		</tr>
+		<tr>
+			<td><img src="too_high.png" class="table_image_pad_right"/></td><td><p>... Too high, tune down</p></td>		
+		</tr>
+	</table>
+	</div>
+	
+	<p id="tuner_mode_paragraph">
+	The tuner uses the default audio input device set in your OS sound device setting(See <a href="#setup_mode">setup mode</a>).
+	</p>
+
+	</div>
+</div>
+
+<div id="metronome_mode">
+	<div class="narrow">
+		<h2>Metronome Mode</h2>
+		<img src="metronome_mode.png" id="metronome_mode_png" />
+	<div class="clear"></div>
+	
+	<p id="metronome_mode_paragraph">
+	The sound output will come out of the currently set output device<br/>(See <a href="#setup_mode">setup mode</a>).
+	</p>
+
+</div>
+</div>
+
+
+<div id="setup_mode">
+	<div class="narrow">
+		<h2>Setup Mode</h2>
+		<img src="setup_mode.png" id="setup_mode_png"/>
+	<div class="clear"></div>
+	
+	<p id="setup_mode_paragraph">
+	For the tuner to work well, make sure you're getting high enough audio input. The top left button will take you to the sound device dialog where you can find the input volume control (like the one shown below).<br />If you switch to a differnt sound device, restart the application.
+	</p>
+	
+	<img src="microphone_properties.png" id="microphone_properties_png" />
+	<div class="clear"></div>
+	</div>
+</div>
+
+<div id="license">
+<div class="narrow">
+<h2>License</h2>
+
+<p id="license_paragraph">
+This software is distributed under the MIT license. You can use it or modify it freely. You can redistribute this program freely as long as the License notice - the LICENSE.txt file in the root folder - is accompanied with the program.
+<br /><br />
+(c)2017 Hiro Morozumi.
+</p>
+</div>
+</div>
+
+</body>

@@ -1,0 +1,7 @@
+idIcon256 ICON "res/icon/tunaplus_icon_256.ico"
+idIcon128 ICON "res/icon/tunaplus_icon_128.ico"
+idIcon96 ICON "res/icon/tunaplus_icon_96.ico"
+idIcon64 ICON "res/icon/tunaplus_icon_64.ico"
+idIcon48 ICON "res/icon/tunaplus_icon_48.ico"
+idIcon32 ICON "res/icon/tunaplus_icon_32.ico"
+idIcon24 ICON "res/icon/tunaplus_icon_24.ico"

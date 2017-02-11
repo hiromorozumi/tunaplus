@@ -1,0 +1,5 @@
+- setup screen - when any slider's active, let's not make the buttons effective
+- fix all buttons in active state - shadow is too strong
+- do test in all systems
+- design icon
+- write bare minimum manual to get started

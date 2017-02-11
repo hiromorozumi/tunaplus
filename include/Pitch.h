@@ -17,6 +17,8 @@ class Pitch
 {
 public:
 
+	static constexpr double BASE_THRESHOLD_AMPLITUDE = 1500;
+
 	static constexpr double TWOPI = 6.283185307179586476925286766559;
 	static constexpr int N = 65535;
 	static constexpr double sampleRate = 44100;
@@ -26,9 +28,11 @@ public:
 	fftw_plan p;
 	Audio* audio;
 	double magnitude[65535];
+	double audioInBoostFactor;
 	
 	double frequencyTable[108];
 	double semitoneRatio;
+	double referencePitch;
 	double middleC;
 	double cZero;
 	
@@ -55,9 +59,11 @@ public:
 	void initialize();
 	void refresh();
 	void bindAudio(Audio* r);
+	void setAudioInBoostFactor(double factor);
+	double getAudioInBoostFactor();
 	double detect();
 	double tau(double x);
-	void buildFreqencyTable();
+	void buildFrequencyTable(double refPitch);
 	double noteToFrequency(int noteNum);
 	double frequencyToNote(double freq);
 	double getCurrentNoteDeltaPercent();

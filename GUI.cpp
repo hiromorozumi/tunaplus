@@ -21,9 +21,14 @@ void GUI::initialize()
 	if (!font.loadFromFile(fontFileName))
 		cout << "Error reading font " << fontFileName << endl;
 	
+	referencePitch = 440;
 	restartTimer();
 	pitch.bindAudio(&audio);
 	audio.bindMetronome(&metronome);
+	
+	audioInBoost = 15;
+	double newFactor = ((double)(audioInBoost) * 49.0 / 100.0) + 1.0; // scale to 1.0 to 50.0
+	pitch.setAudioInBoostFactor(newFactor);	
 	
 	// Create the main window
 	window.create(sf::VideoMode(240, 240), "Tuna+", 2); // 3rd param is for sf::Style
@@ -147,6 +152,40 @@ void GUI::initialize()
 	metronomeVolSlider.create(&mouse, &window);
 	metronomeVolSlider.setPosition(64, 166);
 
+	// setup mode assets
+	strFile = filePrefix + "setup_button";
+	setupButton.create(strFile, &mouse, &window);
+	setupButton.setPosition(71, 21);
+	strFile = filePrefix + "help_button";
+	helpButton.create(strFile, &mouse, &window);
+	helpButton.setPosition(125, 21);
+	
+	referencePitchSlider.create(&mouse, &window);
+	referencePitchSlider.setPosition(69, 104);	
+	referencePitchTextLabel.setFont(font);
+	referencePitchTextLabel.setString("Reference pitch:");
+	referencePitchTextLabel.setFillColor(sf::Color(40, 40, 40));
+	referencePitchTextLabel.setCharacterSize(13);
+	referencePitchTextLabel.setPosition(sf::Vector2f(69, 77));	
+	referencePitchText.setFont(font);
+	referencePitchText.setString("440");
+	referencePitchText.setFillColor(sf::Color(40, 40, 40));
+	referencePitchText.setCharacterSize(14);
+	referencePitchText.setPosition(sf::Vector2f(156, 97));
+
+	audioInBoostSlider.create(&mouse, &window);
+	audioInBoostSlider.setPosition(69, 156); // was 104 so add 52	
+	audioInBoostTextLabel.setFont(font);
+	audioInBoostTextLabel.setString("Audio-in boost:");
+	audioInBoostTextLabel.setFillColor(sf::Color(40, 40, 40));
+	audioInBoostTextLabel.setCharacterSize(13);
+	audioInBoostTextLabel.setPosition(sf::Vector2f(69, 129));	
+	audioInBoostText.setFont(font);
+	audioInBoostText.setString(" 15");
+	audioInBoostText.setFillColor(sf::Color(40, 40, 40));
+	audioInBoostText.setCharacterSize(14);
+	audioInBoostText.setPosition(sf::Vector2f(156, 149));
+	
 	// tuner variables
 	backgroundAlpha = 0;
 	tunerStateChanged = false;
@@ -164,7 +203,12 @@ void GUI::initialize()
 	tempoUpNextUpdateTime = 0.5;
 	tempoDownFiring = false;
 	tempoDownNextUpdateTime = 0.5;
+
+	// setup mode variables
+	referencePitchSlider.setValuePercent(50);
+	audioInBoostSlider.setValuePercent(audioInBoost);
 	
+	// getting ready...
 	exitApp = false;
 	currentMode = TUNER_MODE;
 	audio.setRecordingMode();
@@ -219,6 +263,8 @@ void GUI::start()
 			runMetronome();
 		else if(currentMode==RECORDER_MODE)
 			runRecorder();
+		else if(currentMode==SETUP_MODE)
+			runSetup();
 	}
 }
 
@@ -473,11 +519,11 @@ void GUI::runMetronome()
 		// now change mode to next one
 		metronomePlaying = false;
 		metronome.stop();
-		currentMode = TUNER_MODE;
-		audio.refresh();
-		audio.setRecordingMode();
-		pitch.refresh(); // refresh audio buffer for gentle restarting
-		backgroundAlpha = 0;
+		currentMode = SETUP_MODE;
+		// audio.refresh();
+		// audio.setRecordingMode();
+		// pitch.refresh(); // refresh audio buffer for gentle restarting
+		// backgroundAlpha = 0;
 	}
 
 	// process for nbeats button - n/4 time
@@ -553,6 +599,7 @@ void GUI::runMetronome()
 			// metronome.report();			
 			
 			metronome.start();
+			refreshBPMText();
 		}
 		else
 		{
@@ -561,6 +608,7 @@ void GUI::runMetronome()
 			cout << "metronome - stop.\n";
 			
 			metronome.stop();
+			refreshBPMText();
 		}
 	}
 	
@@ -698,7 +746,7 @@ void GUI::refreshBPMText()
 
 ///////////////////////////////////////////////
 //
-// audio main loop (TODO)
+// recorder main loop (TODO)
 //
 ///////////////////////////////////////////////
 
@@ -714,4 +762,121 @@ void GUI::runRecorder()
 		// now change mode to next one
 		currentMode = TUNER_MODE;
 	}		
+}
+
+///////////////////////////////////////////////
+//
+// setup mode main loop (TODO)
+//
+///////////////////////////////////////////////
+
+void GUI::runSetup()
+{
+	// process for power button
+	powerButton.update();
+	if(powerButton.tailActionRequest())
+	{
+		cout << "Power off - exiting app...\n";
+		exitApp = true;
+	}
+
+	// process for menu button
+	menuButton.update();
+	if(menuButton.tailActionRequest())
+	{
+		cout << "Mode change request, going to Next Mode...\n";
+		
+		// now change mode to next one
+		currentMode = TUNER_MODE;
+		audio.refresh();
+		audio.setRecordingMode();
+		pitch.refresh(); // refresh audio buffer for gentle restarting
+		backgroundAlpha = 0;
+	}
+
+	// process for setup button
+	setupButton.update();
+	if(setupButton.frontActionRequest())
+	{
+		string exeCommand = "mmsys.cpl";
+		ShellExecute( NULL, NULL, exeCommand.c_str(), NULL, NULL, SW_SHOWNORMAL );	
+		cout << "Entering sound device setup...\n";
+	}	
+
+	// process for help button
+	helpButton.update();
+	if(helpButton.frontActionRequest())
+	{
+		// let's open the manual in 'documentation' folder that's in cwd
+		string docPath = "documentation\\tunaplus_manual.html";
+		string docPath2 = currentWorkingDir + "\\documentation\\tunaplus_manual.html";
+		cout << "Opening Doc at: " << docPath2 << endl;		
+		ShellExecute( NULL, NULL, docPath2.c_str(), NULL, NULL, SW_SHOWNORMAL );		
+	}
+
+	// reference pitch slider
+	referencePitchSlider.update();
+	if(referencePitchSlider.stateChanged())
+	{
+		referencePitch = 435 + (int)(round((double)referencePitchSlider.getValuePercent()/10.0));
+		
+		// now let Pitch class rebuild the frequency table (used for referencing in tuner mode)
+		pitch.buildFrequencyTable((double)referencePitch);
+		
+		// convert the value to string
+		ss.str("");
+		ss << referencePitch;
+		string strNewRefPitch = ss.str();
+
+		// now set the string
+		referencePitchText.setString(strNewRefPitch);	
+		cout << "Reference Pitch: " << referencePitch << endl;
+	}	
+
+	// audio-in boost slider
+	audioInBoostSlider.update();
+	if(audioInBoostSlider.stateChanged())
+	{
+		audioInBoost = (int)(audioInBoostSlider.getValuePercent());
+		
+		// slider value range 0-100 -> audio-in boost factor 1.0 to 50.0
+		double newFactor = ((double)(audioInBoost) * 49.0 / 100.0) + 1.0;
+		pitch.setAudioInBoostFactor(newFactor);
+		
+		// DEBUG
+		cout << "Audio-in Boost factor is now: " << newFactor << endl;
+		
+		// determine how many space needs to be padded to the left of amt display
+		string spacePad = "";
+		if(audioInBoost<10) spacePad = "  ";
+		else if(audioInBoost<100) spacePad = " ";
+		
+		// convert the value to string
+		ss.str("");
+		ss << spacePad << audioInBoost;
+		string strNewAudioInBoost = ss.str();
+
+		// now set the string
+		audioInBoostText.setString(strNewAudioInBoost);	
+		cout << "Audio-in boost: " << audioInBoost << endl;
+	}
+	
+	// draw screen...
+
+	window.clear();
+	window.draw(tunerBase); // 1 - draw base GUI
+	
+	menuButton.draw();
+	powerButton.draw();
+	
+	setupButton.draw();
+	helpButton.draw();
+	window.draw(referencePitchTextLabel);
+	window.draw(referencePitchText);
+	referencePitchSlider.draw();
+	window.draw(audioInBoostTextLabel);
+	window.draw(audioInBoostText);
+	audioInBoostSlider.draw();
+	
+	window.display();	
 }

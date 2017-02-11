@@ -1,0 +1,556 @@
+<?hml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+
+	<Product Name='Tuna+' 
+		Id='BFF5F0F4-1099-4AAF-B5BB-97B86BB08DCA'
+		UpgradeCode='D374F767-EBAF-43A8-9E8D-D79094CA62CF'
+		Language='1033'
+		Codepage='1252'
+		Version='0.1.0'
+		Manufacturer='Gingerroot Soft'>
+	
+	<Package Id='*' Keywords='Installer' 
+		Description="Tuna+ Installer"
+		Comments='This installs Tuna+ in your machine.'
+		Manufacturer='Gingerroot Soft'
+		InstallerVersion='100' Languages='1033' Compressed='yes'
+		SummaryCodepage='1252' />
+
+	<Media Id='1' Cabinet='tunaplus.cab' EmbedCab='yes' DiskPrompt="CD-ROM #1" />
+
+	<Property Id='DiskPrompt' Value="Tuna+ Installation [1]" />
+
+	
+	
+	<Directory Id="TARGETDIR" Name="SourceDir">
+
+
+		<Directory Id="DesktopFolder" Name="Desktop">
+
+			<Component Id="ApplicationShortcutDesktop" Guid="*">
+				<Shortcut Id="ApplicationDesktopShortcut"
+						Name="Tuna+"
+						Description="Launch Tuna+"
+						Target="[INSTALLDIR]tunaplus.exe"
+						WorkingDirectory='INSTALLDIR'/>
+
+				<RemoveFolder Id="DesktopFolder" On="uninstall"/>
+					<RegistryValue
+						Root="HKCU"
+						Key='Software\[Manufacturer]\[ProductName]'
+						Name="installed"
+						Type="integer"
+						Value="1"
+						KeyPath="yes"/>
+			</Component>
+
+		</Directory>	
+
+
+	
+		<Directory Id="ProgramFilesFolder" Name="PFiles">
+			<Directory Id="INSTALLDIR" Name="Tuna+">
+			
+				<Component Id="removeInstallDir" Guid="{3A374ADF-5943-40C6-AA2B-D0C40D0455A8}">
+					<RemoveFile Id="RemoveInstalledFiles" On ="uninstall" Name="*.*"/>
+					<RemoveFolder Id="RemoveInstallFolder" On="uninstall"/>
+				</Component>			
+			
+			
+			
+				<Component Id='cmp_tunaplusEXE' Guid='{E5ED52F5-4469-47B5-81C2-4E37D31049DC}'>
+					<File Id="tunaplusEXE" Name="tunaplus.exe" DiskId='1' Source='..\tunaplus.exe' KeyPath='yes'>
+						<Shortcut Id="startmenuTunaPlus" Directory="ProgramMenuDir" Name="Tuna+" WorkingDirectory='INSTALLDIR' Icon="tunaplus_icon_24.ico" IconIndex="0" Advertise="yes" />
+					</File>
+				</Component>
+				
+				<Component Id='cmp_libwinpthread_1DLL' Guid='*'>
+					<File Id="libwinpthread_1DLL" Name="libwinpthread-1.dll" 
+					DiskId='1' Source='..\libwinpthread-1.dll' KeyPath='yes'>				
+					</File>
+				</Component>				
+
+				<Component Id='cmp_libgcc_s_dw2_1DLL' Guid='*'>
+					<File Id="libgcc_s_dw2_1DLL" Name="libgcc_s_dw2-1.dll" 
+					DiskId='1' Source='..\libgcc_s_dw2-1.dll' KeyPath='yes'>				
+					</File>
+				</Component>
+	
+				<Component Id='cmp_libstdcpp_6DLL' Guid='*'>
+					<File Id="libstdcpp_6DLL" Name="libstdc++-6.dll" 
+					DiskId='1' Source='..\libstdc++-6.dll' KeyPath='yes'>				
+					</File>
+				</Component>
+
+				<Component Id='cmp_portaudio_x86DLL' Guid='*'>
+					<File Id="portaudio_x86DLL" Name="portaudio_x86.dll" 
+					DiskId='1' Source='..\portaudio_x86.dll' KeyPath='yes'>				
+					</File>
+				</Component>
+				
+				<Component Id='cmp_sfml_graphics_2DLL' Guid='*'>
+					<File Id="sfml_graphics_2DLL" Name="sfml-graphics-2.dll" 
+					DiskId='1' Source='..\sfml-graphics-2.dll' KeyPath='yes'>				
+					</File>
+				</Component>
+
+				<Component Id='cmp_sfml_system_2DLL' Guid='*'>
+					<File Id="sfml_system_2DLL" Name="sfml-system-2.dll" 
+					DiskId='1' Source='..\sfml-system-2.dll' KeyPath='yes'>				
+					</File>
+				</Component>
+
+				<Component Id='cmp_sfml_window_2DLL' Guid='*'>
+					<File Id="sfml_window_2DLL" Name="sfml-window-2.dll" 
+					DiskId='1' Source='..\sfml-window-2.dll' KeyPath='yes'>				
+					</File>
+				</Component>
+
+
+				
+				<Component Id='cmp_READMETXT' Guid='*'>
+					<File Id="READMETXT" Name="README.txt" 
+					DiskId='1' Source='..\README.txt' KeyPath='yes'>				
+					</File>
+				</Component>
+
+				<Component Id='cmp_LICENSETXT' Guid='*'>
+					<File Id="LICENSETXT" Name="LICENSE.txt" 
+					DiskId='1' Source='..\LICENSE.txt' KeyPath='yes'>				
+					</File>
+				</Component>
+
+
+
+				
+				
+				<Directory Id="ResourcesDir" Name="res" >
+				
+					<Component Id="removeResourcesDir" Guid="{A69C52FE-AE47-4474-95EB-4A98FA1D1E16}">
+						<RemoveFile Id="RemoveAllImageFiles" On ="uninstall" Name="*.*"/>
+						<RemoveFolder Id="RemoveResourcesFolder" On="uninstall"/>
+					</Component>
+
+					<Component Id='cmp_AUDIMBTTF' Guid='*'>
+						<File Id="AUDIMBTTF" Name="AUDIMB.ttf" 
+						DiskId='1' Source='..\res\AUDIMB.ttf' KeyPath="yes">				
+						</File>
+					</Component>
+					
+					<Component Id='cmp_basePNG' Guid='*'>
+						<File Id="basePNG" Name="base.png" 
+						DiskId='1' Source='..\res\base.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_blinkerPNG' Guid='*'>
+						<File Id="blinkerPNG" Name="blinker.png" 
+						DiskId='1' Source='..\res\blinker.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_blinker_greenPNG' Guid='*'>
+						<File Id="blinker_greenPNG" Name="blinker_green.png" 
+						DiskId='1' Source='..\res\blinker_green.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_blinker_redPNG' Guid='*'>
+						<File Id="blinker_redPNG" Name="blinker_red.png" 
+						DiskId='1' Source='..\res\blinker_red.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_help_buttonPNG' Guid='*'>
+						<File Id="help_buttonPNG" Name="help_button.png" 
+						DiskId='1' Source='..\res\help_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_help_button_activePNG' Guid='*'>
+						<File Id="help_button_activePNG" Name="help_button_active.png" 
+						DiskId='1' Source='..\res\help_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_menu_buttonPNG' Guid='*'>
+						<File Id="menu_buttonPNG" Name="menu_button.png" 
+						DiskId='1' Source='..\res\menu_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_menu_button_activePNG' Guid='*'>
+						<File Id="menu_button_activePNG" Name="menu_button_active.png" 
+						DiskId='1' Source='..\res\menu_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>					
+	
+					<Component Id='cmp_metronome_screenPNG' Guid='*'>
+						<File Id="metronome_screenPNG" Name="metronome_screen.png" 
+						DiskId='1' Source='..\res\metronome_screen.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_metronome_screen_redPNG' Guid='*'>
+						<File Id="metronome_screen_redPNG" Name="metronome_screen_red.png" 
+						DiskId='1' Source='..\res\metronome_screen_red.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_nbeats_buttonPNG' Guid='*'>
+						<File Id="nbeats_buttonPNG" Name="nbeats_button.png" 
+						DiskId='1' Source='..\res\nbeats_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_nbeats_button_activePNG' Guid='*'>
+						<File Id="nbeats_button_activePNG" Name="nbeats_button_active.png" 
+						DiskId='1' Source='..\res\nbeats_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+
+					<Component Id='cmp_play_buttonPNG' Guid='*'>
+						<File Id="play_buttonPNG" Name="play_button.png" 
+						DiskId='1' Source='..\res\play_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_play_button_activePNG' Guid='*'>
+						<File Id="play_button_activePNG" Name="play_button_active.png" 
+						DiskId='1' Source='..\res\play_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_play_button_altPNG' Guid='*'>
+						<File Id="play_button_altPNG" Name="play_button_alt.png" 
+						DiskId='1' Source='..\res\play_button_alt.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_play_button_alt_activePNG' Guid='*'>
+						<File Id="play_button_alt_activePNG" Name="play_button_alt_active.png" 
+						DiskId='1' Source='..\res\play_button_alt_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+
+
+					<Component Id='cmp_power_buttonPNG' Guid='*'>
+						<File Id="power_buttonPNG" Name="power_button.png" 
+						DiskId='1' Source='..\res\power_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_power_button_activePNG' Guid='*'>
+						<File Id="power_button_activePNG" Name="power_button_active.png" 
+						DiskId='1' Source='..\res\power_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_red_circlePNG' Guid='*'>
+						<File Id="red_circlePNG" Name="red_circle.png" 
+						DiskId='1' Source='..\res\red_circle.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+					<Component Id='cmp_setup_buttonPNG' Guid='*'>
+						<File Id="setup_buttonPNG" Name="setup_button.png" 
+						DiskId='1' Source='..\res\setup_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_setup_button_activePNG' Guid='*'>
+						<File Id="setup_button_activePNG" Name="setup_button_active.png" 
+						DiskId='1' Source='..\res\setup_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_slider_barPNG' Guid='*'>
+						<File Id="slider_barPNG" Name="slider_bar.png" 
+						DiskId='1' Source='..\res\slider_bar.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_slider_handlePNG' Guid='*'>
+						<File Id="slider_handlePNG" Name="slider_handle.png" 
+						DiskId='1' Source='..\res\slider_handle.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+					<Component Id='cmp_tap_buttonPNG' Guid='*'>
+						<File Id="tap_buttonPNG" Name="tap_button.png" 
+						DiskId='1' Source='..\res\tap_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_tap_button_activePNG' Guid='*'>
+						<File Id="tap_button_activePNG" Name="tap_button_active.png" 
+						DiskId='1' Source='..\res\tap_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_tempo_down_buttonPNG' Guid='*'>
+						<File Id="tempo_down_buttonPNG" Name="tempo_down_button.png" 
+						DiskId='1' Source='..\res\tempo_down_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_tempo_down_button_activePNG' Guid='*'>
+						<File Id="tempo_down_button_activePNG" Name="tempo_down_button_active.png" 
+						DiskId='1' Source='..\res\tempo_down_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+					<Component Id='cmp_tempo_up_buttonPNG' Guid='*'>
+						<File Id="tempo_up_buttonPNG" Name="tempo_up_button.png" 
+						DiskId='1' Source='..\res\tempo_up_button.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_tempo_up_button_activePNG' Guid='*'>
+						<File Id="tempo_up_button_activePNG" Name="tempo_up_button_active.png" 
+						DiskId='1' Source='..\res\tempo_up_button_active.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_tuner_screenPNG' Guid='*'>
+						<File Id="tuner_screenPNG" Name="tuner_screen.png" 
+						DiskId='1' Source='..\res\tuner_screen.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_tuner_screen_redPNG' Guid='*'>
+						<File Id="tuner_screen_redPNG" Name="tuner_screen_red.png" 
+						DiskId='1' Source='..\res\tuner_screen_red.png' KeyPath='yes'>				
+						</File>		
+					</Component>		
+				
+				
+				</Directory>
+
+
+
+				
+
+
+				
+				<Directory Id="DocumentationDir" Name="documentation" >
+				
+					<Component Id="removeDocumentationDir" Guid="{BAE734B4-B76E-410F-88BD-76D1B01B501F}">
+						<RemoveFile Id="RemoveAllDocFiles" On ="uninstall" Name="*.*"/>
+						<RemoveFolder Id="RemoveDocumentationFolder" On="uninstall"/>
+					</Component>
+					
+					<Component Id='cmp_tunaplus_manualHTML' Guid='{A266F40D-5003-4BA2-BEB7-FF774CFA9B8D}'>
+						<File Id="tunaplus_manualHTML" Name="tunaplus_manual.html" 
+						DiskId='1' Source='..\documentation\tunaplus_manual.html' KeyPath='yes'>						
+						</File>
+					</Component>
+
+					<Component Id='cmp_styleCSS' Guid='*'>
+						<File Id="styleCSS" Name="style.css" 
+						DiskId='1' Source='..\documentation\style.css' KeyPath='yes'>				
+						</File>
+					</Component>
+
+					<Component Id='cmp_in_tunePNG' Guid=''>
+						<File Id="in_tunePNG" Name="in_tune.png" 
+						DiskId='1' Source='..\documentation\in_tune.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_metronome_modePNG' Guid='*'>
+						<File Id="metronome_modePNG" Name="metronome_mode.png" 
+						DiskId='1' Source='..\documentation\metronome_mode.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_microphone_propertiesPNG' Guid='*'>
+						<File Id="microphone_propertiesPNG" Name="microphone_properties.png" 
+						DiskId='1' Source='..\documentation\microphone_properties.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_setup_modePNG' Guid='*'>
+						<File Id="setup_modePNG" Name="setup_mode.png" 
+						DiskId='1' Source='..\documentation\setup_mode.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_too_highPNG' Guid='*'>
+						<File Id="too_highPNG" Name="too_high.png" 
+						DiskId='1' Source='..\documentation\too_high.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+					<Component Id='cmp_too_lowPNG' Guid='*'>
+						<File Id="too_lowPNG" Name="too_low.png" 
+						DiskId='1' Source='..\documentation\too_low.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_tuner_modePNG' Guid='*'>
+						<File Id="tuner_modePNG" Name="tuner_mode.png" 
+						DiskId='1' Source='..\documentation\tuner_mode.png' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+					<Component Id='cmp_hvd_bodedo_webfontWOFF' Guid='*'>
+						<File Id="hvd_bodedo_webfontWOFF" Name="hvd_bodedo-webfont.woff" 
+						DiskId='1' Source='..\documentation\hvd_bodedo-webfont.woff' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_palanquindark_semibold_webfontWOFF' Guid='*'>
+						<File Id="palanquindark_semibold_webfontWOFF" Name="palanquindark-semibold-webfont.woff" 
+						DiskId='1' Source='..\documentation\palanquindark-semibold-webfont.woff' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+					<Component Id='cmp_sen_regular_webfontWOFF' Guid='*'>
+						<File Id="sen_regular_webfontWOFF" Name="sen-regular-webfont.woff" 
+						DiskId='1' Source='..\documentation\sen-regular-webfont.woff' KeyPath='yes'>				
+						</File>		
+					</Component>					
+
+					<Component Id='cmp_hvd_bodedo_webfontWOFF2' Guid='*'>
+						<File Id="hvd_bodedo_webfontWOFF2" Name="hvd_bodedo-webfont.woff2" 
+						DiskId='1' Source='..\documentation\hvd_bodedo-webfont.woff2' KeyPath='yes'>				
+						</File>		
+					</Component>
+					
+					<Component Id='cmp_palanquindark_semibold_webfontWOFF2' Guid='*'>
+						<File Id="palanquindark_semibold_webfontWOFF2" Name="palanquindark-semibold-webfont.woff2" 
+						DiskId='1' Source='..\documentation\palanquindark-semibold-webfont.woff2' KeyPath='yes'>				
+						</File>		
+					</Component>
+
+					<Component Id='cmp_sen_regular_webfontWOFF2' Guid='*'>
+						<File Id="sen_regular_webfontWOFF2" Name="sen-regular-webfont.woff2" 
+						DiskId='1' Source='..\documentation\sen-regular-webfont.woff2' KeyPath='yes'>				
+						</File>		
+					</Component>					
+					
+				</Directory>
+				
+				
+				<Component Id="UninstallShortcutMenu" Guid="{6420EB9D-F1B2-4CD3-9ACB-EA3E0D16F3DF}">
+					<Shortcut Id="UninstallProduct" Name="Uninstall Tuna+"
+					Target="[SystemFolder]msiexec.exe" Directory="ProgramMenuDir"
+					Arguments="/x [ProductCode]" />
+					<RemoveFolder Id="INSTALLDIR" On="uninstall" />
+					<RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer"
+					Value="1" KeyPath="yes" />
+				</Component>
+				
+				
+			</Directory>
+		</Directory>
+		
+		
+		<Directory Id="ProgramMenuFolder" Name="Programs">
+			<Directory Id="ProgramMenuDir" Name="Tuna+">
+
+				<Component Id="ProgramMenuDir" Guid="*">
+					<RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+					<RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
+				</Component>
+
+			</Directory>
+        </Directory>
+		
+		
+	</Directory>
+	
+	
+    <Feature Id='Complete' Level='1'>
+
+		<ComponentRef Id='ApplicationShortcutDesktop' />
+
+		<ComponentRef Id="removeInstallDir" />
+
+		<ComponentRef Id='cmp_tunaplusEXE' />
+		<ComponentRef Id='cmp_libwinpthread_1DLL' />
+		<ComponentRef Id='cmp_libgcc_s_dw2_1DLL' />
+		<ComponentRef Id='cmp_libstdcpp_6DLL' />
+		<ComponentRef Id='cmp_portaudio_x86DLL' />
+		<ComponentRef Id='cmp_sfml_graphics_2DLL' />
+		<ComponentRef Id='cmp_sfml_system_2DLL' />
+		<ComponentRef Id='cmp_sfml_window_2DLL' />
+		
+		<ComponentRef Id='cmp_READMETXT' />
+		<ComponentRef Id='cmp_LICENSETXT' />		
+		
+		<ComponentRef Id="removeResourcesDir" />
+		
+		<ComponentRef Id='cmp_AUDIMBTTF' />
+		<ComponentRef Id='cmp_basePNG' />
+		<ComponentRef Id='cmp_blinkerPNG' />
+		<ComponentRef Id='cmp_blinker_greenPNG' />
+		<ComponentRef Id='cmp_blinker_redPNG' />
+		<ComponentRef Id='cmp_help_buttonPNG' />
+		<ComponentRef Id='cmp_help_button_activePNG' />
+		<ComponentRef Id='cmp_menu_buttonPNG' />
+		<ComponentRef Id='cmp_menu_button_activePNG' />
+		<ComponentRef Id='cmp_metronome_screenPNG' />
+		<ComponentRef Id='cmp_metronome_screen_redPNG' />
+		<ComponentRef Id='cmp_nbeats_buttonPNG' />
+		<ComponentRef Id='cmp_nbeats_button_activePNG' />
+		<ComponentRef Id='cmp_play_buttonPNG' />
+		<ComponentRef Id='cmp_play_button_activePNG' />
+		<ComponentRef Id='cmp_play_button_altPNG' />
+		<ComponentRef Id='cmp_play_button_alt_activePNG' />
+		<ComponentRef Id='cmp_power_buttonPNG' />
+		<ComponentRef Id='cmp_power_button_activePNG' />
+		<ComponentRef Id='cmp_red_circlePNG' />
+		<ComponentRef Id='cmp_setup_buttonPNG' />
+		<ComponentRef Id='cmp_setup_button_activePNG' />
+		<ComponentRef Id='cmp_slider_barPNG' />
+		<ComponentRef Id='cmp_slider_handlePNG' />
+		<ComponentRef Id='cmp_tap_buttonPNG' />
+		<ComponentRef Id='cmp_tap_button_activePNG' />
+		<ComponentRef Id='cmp_tempo_down_buttonPNG' />
+		<ComponentRef Id='cmp_tempo_down_button_activePNG' />
+		<ComponentRef Id='cmp_tempo_up_buttonPNG' />
+		<ComponentRef Id='cmp_tempo_up_button_activePNG' />
+		<ComponentRef Id='cmp_tuner_screenPNG' />
+		<ComponentRef Id='cmp_tuner_screen_redPNG' />
+		
+		<ComponentRef Id="removeDocumentationDir" />
+
+		<ComponentRef Id='cmp_tunaplus_manualHTML' />
+		<ComponentRef Id='cmp_styleCSS' />
+		<ComponentRef Id='cmp_in_tunePNG' />
+		<ComponentRef Id='cmp_metronome_modePNG' />
+		<ComponentRef Id='cmp_microphone_propertiesPNG' />
+		<ComponentRef Id='cmp_setup_modePNG' />
+		<ComponentRef Id='cmp_too_highPNG' />
+		<ComponentRef Id='cmp_too_lowPNG' />
+		<ComponentRef Id='cmp_tuner_modePNG' />
+		<ComponentRef Id='cmp_hvd_bodedo_webfontWOFF' />
+		<ComponentRef Id='cmp_palanquindark_semibold_webfontWOFF' />
+		<ComponentRef Id='cmp_sen_regular_webfontWOFF' />
+		<ComponentRef Id='cmp_hvd_bodedo_webfontWOFF2' />
+		<ComponentRef Id='cmp_palanquindark_semibold_webfontWOFF2' />
+		<ComponentRef Id='cmp_sen_regular_webfontWOFF2' />
+		
+		<ComponentRef Id="UninstallShortcutMenu" />
+		
+		<ComponentRef Id='ProgramMenuDir' />	
+		
+    </Feature>
+	
+	<UIRef Id="WixUI_Minimal" />
+	<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+	
+	<Icon Id="tunaplus_icon_24.ico" SourceFile="tunaplus_icon_24.ico" />
+	<Icon Id="tunaplus_icon_48.ico" SourceFile="tunaplus_icon_48.ico" />
+	<Property Id="ARPPRODUCTICON" Value="tunaplus_icon_48.ico" />
+	
+	<WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+	<WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
+	<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+
+	</Product>
+</Wix>

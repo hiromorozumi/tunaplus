@@ -477,8 +477,12 @@ class GUI
 public:
 
 static constexpr float PI = 3.1415926535897932384626433832795;
+//static constexpr int TUNER_MODE = 0;
+//static constexpr int METRONOME_MODE = 1;
+//static constexpr int RECORDER_MODE = 2;
+//static constexpr int SETUP_MODE = 3;
 
-enum{ TUNER_MODE, METRONOME_MODE, RECORDER_MODE };
+enum{ TUNER_MODE, METRONOME_MODE, RECORDER_MODE, SETUP_MODE };
 
 Audio audio;
 Pitch pitch;
@@ -502,6 +506,10 @@ sf::Text freqText;
 sf::Text freqFracText;
 sf::Text BPMText;
 sf::Text nBeatsText;
+sf::Text referencePitchTextLabel;
+sf::Text referencePitchText;
+sf::Text audioInBoostTextLabel;
+sf::Text audioInBoostText;
 
 sf::Texture tunerBaseTexture;
 sf::Texture redCircleTexture;
@@ -526,9 +534,14 @@ Button metronomePlayButton;
 Button metronomeNBeatsButton;
 Button metronomeTempoDownButton;
 Button metronomeTempoUpButton;
+Button setupButton;
+Button helpButton;
 
 Blinker blinker;
 Slider metronomeVolSlider;
+Slider referencePitchSlider;
+Slider audioInBoostSlider;
+
 float metronomeVolume;
 bool tapFlashOn;
 bool metronomePlaying;
@@ -544,8 +557,10 @@ float needleTopY;
 int backgroundAlpha;
 bool tunerStateChanged;
 
-bool currentMode;
+int currentMode;
 bool exitApp;
+int referencePitch;
+int audioInBoost;
 
 std::stringstream ss;
 std::string currentWorkingDir;
@@ -563,6 +578,7 @@ void runTuner();
 void runMetronome();
 void refreshBPMText();
 void runRecorder();
+void runSetup();
 
 };
 
