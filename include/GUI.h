@@ -20,8 +20,13 @@ class Kbd
 {
 public:
 
+	sf::RenderWindow* window;
+	
 	Kbd(){}
 	~Kbd(){}
+	
+	void bindWindow(sf::RenderWindow* w)
+	{ window = w; }
 
 	bool right()
 		{ if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) return true; else return false; }
@@ -34,7 +39,8 @@ public:
 	bool ret()
 		{ if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) return true; else return false; }
 	bool escape()
-		{ if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) return true; else return false; }
+		{ if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && window->hasFocus())
+			return true; else return false; }
 	bool f1()
 		{ if(sf::Keyboard::isKeyPressed(sf::Keyboard::F1)) return true; else return false; }
 	bool f2()
@@ -45,7 +51,10 @@ public:
 		{ if(sf::Keyboard::isKeyPressed(sf::Keyboard::F4)) return true; else return false; }
 	bool f5()
 		{ if(sf::Keyboard::isKeyPressed(sf::Keyboard::F5)) return true; else return false; }
-
+	bool home()
+		{ if(sf::Keyboard::isKeyPressed(sf::Keyboard::Home) && window->hasFocus()) 
+			return true; else return false; }
+		
 private:
 
 };
@@ -76,9 +85,11 @@ public:
 	}
 
 	bool left()
-		{ if( sf::Mouse::isButtonPressed(sf::Mouse::Left) ) return true; else return false;  }
+		{ if( sf::Mouse::isButtonPressed(sf::Mouse::Left) && w->hasFocus()) 
+			return true; else return false;  }
 	bool right()
-		{ if( sf::Mouse::isButtonPressed(sf::Mouse::Right) ) return true; else return false; }
+		{ if( sf::Mouse::isButtonPressed(sf::Mouse::Right) && w->hasFocus()) 
+			return true; else return false; }
 	int x()
 		{ return sf::Mouse::getPosition(const_cast<sf::RenderWindow&>(*w)).x; }
 	int y()
@@ -180,6 +191,10 @@ public:
 	
 	void update()
 	{
+		// if window has lost focus don't update
+		if(!window->hasFocus())
+			return;
+		
 		if(hovering())
 		{
 			highlighted = true;
@@ -425,6 +440,11 @@ public:
 	void update()
 	{
 		stateUpdated = false;
+		
+		// if window isn't focused, do not process input
+		if(!window->hasFocus())
+			return;
+		
 		if(!dragging && hovering() && mouse->left()) // just starting to drag
 		{
 			int dummy = mouse->getXDelta();
@@ -440,6 +460,11 @@ public:
 			if(xMoved!=0)
 				stateUpdated = true;
 		}
+	}
+	
+	bool isDragging()
+	{
+		return dragging;
 	}
 	
 	void moveHandle(float xDiff)
@@ -496,6 +521,7 @@ sf::Clock tapFlashTimer;
 sf::Clock blinkerTimer;
 sf::Clock tempoUpBtnFireTimer;
 sf::Clock tempoDownBtnFireTimer;
+sf::Clock audioStreamCheckClock;
 
 sf::Font font;
 sf::RenderWindow window;
@@ -556,11 +582,14 @@ float needleTopX;
 float needleTopY;
 int backgroundAlpha;
 bool tunerStateChanged;
+int tunerNoteNumberTracking;
+bool sameNoteSustaining;
 
 int currentMode;
 bool exitApp;
 int referencePitch;
 int audioInBoost;
+bool windowFocused;
 
 std::stringstream ss;
 std::string currentWorkingDir;
@@ -575,6 +604,7 @@ unsigned long long getTimeMs64();
 void restartTimer();
 long getElapsedTime();
 void runTuner();
+void clearTunerDisplayAll();
 void runMetronome();
 void refreshBPMText();
 void runRecorder();

@@ -17,7 +17,7 @@ class Pitch
 {
 public:
 
-	static constexpr double BASE_THRESHOLD_AMPLITUDE = 1500;
+	static constexpr double BASE_THRESHOLD_AMPLITUDE = 2000;
 
 	static constexpr double TWOPI = 6.283185307179586476925286766559;
 	static constexpr int N = 65535;

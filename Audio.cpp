@@ -188,3 +188,14 @@ void Audio::raiseError(PaError e)
 	cout << errText << endl;
 	errorRaised = true;
 }
+
+// return portaudio stream state in boolean
+// success is good, still playing, false -> need to reinitialize portaudio
+bool Audio::streamStateOkay()
+{
+	err = Pa_IsStreamStopped( stream );
+	if(err==0)
+		return true;
+	else
+		return false;
+}

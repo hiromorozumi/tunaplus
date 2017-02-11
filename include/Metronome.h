@@ -23,6 +23,7 @@ class Metronome
 public:
 
 	static constexpr double SAMPLE_RATE = 44100;
+	static constexpr float VOLUME_SCALING_FACTOR = 0.60f;
 	
 	// std::vector<Note> sequence;
 	Note sequence[20];

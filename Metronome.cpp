@@ -226,7 +226,7 @@ void Metronome::setVolume(float v)
 {
 	if(v <= 0.0f) v = 0.0f;
 	else if(v>0.99f) v = 0.99f;
-	metronomeVolume = v;
+	metronomeVolume = v * VOLUME_SCALING_FACTOR; // let's not make it too loud
 }
 
 float Metronome::getVolume()

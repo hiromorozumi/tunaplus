@@ -25,16 +25,18 @@
 	<Directory Id="TARGETDIR" Name="SourceDir">
 
 
-		<Directory Id="DesktopFolder" Name="Desktop">
+		<Directory Id="DesktopFolder" Name="DesktopShortcut">
 
-			<Component Id="ApplicationShortcutDesktop" Guid="*">
+			<Component Id="ApplicationShortcutDesktop" Guid="654BBFEE-F584-443D-8540-C8249B7DCCDA">
 				<Shortcut Id="ApplicationDesktopShortcut"
-						Name="Tuna+"
-						Description="Launch Tuna+"
-						Target="[INSTALLDIR]tunaplus.exe"
+						Name="Tuna+" 
+						ShortName="tunaplus.lnk"
+						Description="Launch Tuna+" 
+						Target="[INSTALLDIR]tunaplus.exe" 
 						WorkingDirectory='INSTALLDIR'/>
 
-				<RemoveFolder Id="DesktopFolder" On="uninstall"/>
+				<RemoveFile Id="RemoveDesktopShortcut" Name="Tuna+.lnk" ShortName="tunaplus.lnk" On="uninstall" />
+				<RemoveFolder Id="RemoveDesktopFolder" On="uninstall"/>
 					<RegistryValue
 						Root="HKCU"
 						Key='Software\[Manufacturer]\[ProductName]'
@@ -439,7 +441,7 @@
 					<Shortcut Id="UninstallProduct" Name="Uninstall Tuna+"
 					Target="[SystemFolder]msiexec.exe" Directory="ProgramMenuDir"
 					Arguments="/x [ProductCode]" />
-					<RemoveFolder Id="INSTALLDIR" On="uninstall" />
+					<RemoveFolder Id="RemoveUninstallerShortcutMenu" On="uninstall" />
 					<RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer"
 					Value="1" KeyPath="yes" />
 				</Component>
@@ -452,8 +454,8 @@
 		<Directory Id="ProgramMenuFolder" Name="Programs">
 			<Directory Id="ProgramMenuDir" Name="Tuna+">
 
-				<Component Id="ProgramMenuDir" Guid="*">
-					<RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+				<Component Id="ProgramMenuDir" Guid="A6D92B11-2F66-460C-9B89-0F0E3DDD85A6">
+					<RemoveFolder Id="RemoveProgramMenuDir" On='uninstall' />
 					<RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
 				</Component>
 

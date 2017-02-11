@@ -34,6 +34,7 @@ void GUI::initialize()
 	window.create(sf::VideoMode(240, 240), "Tuna+", 2); // 3rd param is for sf::Style
 	
 	mouse.bindWindow(&window);
+	kbd.bindWindow(&window);
 	
 	// Load GUI images to display
 	string strFile;
@@ -86,22 +87,22 @@ void GUI::initialize()
 	needleRect.setOutlineColor(sf::Color(200, 160, 160));
 
 	noteNameText.setFont(font);
-	noteNameText.setString("A");
+	noteNameText.setString(" ");
 	noteNameText.setFillColor(sf::Color(220, 180, 180));
 	noteNameText.setCharacterSize(80);
 	noteNameText.setPosition(sf::Vector2f(34, -4));
 	accidentalText.setFont(font);
-	accidentalText.setString("#");
+	accidentalText.setString(" ");
 	accidentalText.setFillColor(sf::Color(220, 180, 180));
 	accidentalText.setCharacterSize(42);
 	accidentalText.setPosition(sf::Vector2f(74,0));
 	freqText.setFont(font);
-	freqText.setString("440");
+	freqText.setString("   ");
 	freqText.setFillColor(sf::Color(170, 150, 150));
 	freqText.setCharacterSize(52);
 	freqText.setPosition(sf::Vector2f(96, 24));
 	freqFracText.setFont(font);
-	freqFracText.setString(".0");
+	freqFracText.setString("  ");
 	freqFracText.setFillColor(sf::Color(170, 150, 150));
 	freqFracText.setCharacterSize(28);
 	freqFracText.setPosition(sf::Vector2f(176, 48));
@@ -189,13 +190,16 @@ void GUI::initialize()
 	// tuner variables
 	backgroundAlpha = 0;
 	tunerStateChanged = false;
+	tunerNoteNumberTracking = 0;
+	sameNoteSustaining = false;
 	
 	// metronome variables
 	tapFlashOn = false;
 	metronomePlaying = false;
 	metronomePlayButton.showDefaultImage();
-	metronomeVolume = 70;
+	metronomeVolume = 66;
 	metronomeVolSlider.setValuePercent(metronomeVolume);
+	metronome.setVolume(0.66f);
 	metronomeNBeats = 4;
 	currentBPM = 120;
 	metronome.setBPM((double)currentBPM);
@@ -210,15 +214,15 @@ void GUI::initialize()
 	
 	// getting ready...
 	exitApp = false;
+	windowFocused = true;
 	currentMode = TUNER_MODE;
 	audio.setRecordingMode();
-
 }
 
 void GUI::start()
 {
 	audio.start();
-	
+	audioStreamCheckClock.restart();	
 	restartTimer();
 	
 	//
@@ -243,6 +247,11 @@ void GUI::start()
 			if(event.type == sf::Event::Closed)
 				window.close();
 			
+			if (event.type == sf::Event::LostFocus)
+				windowFocused = false;
+			if (event.type == sf::Event::GainedFocus)
+				windowFocused = true;
+			
 			// if resizing requested - well, force the constant size
 			if (event.type == sf::Event::Resized)
 			{
@@ -256,6 +265,28 @@ void GUI::start()
 		if(kbd.escape())
 			exitApp = true;
 		
+		// HOME key will reset audio device
+		// initialize all buffers etc...
+		if(kbd.home())
+		{
+			audio.stop();
+			audio.initialize();
+			audio.start();
+		}
+
+		// check the portaudio stream state every 5 seconds
+		// if BAD, reinitialize portaudio
+		if(audioStreamCheckClock.getElapsedTime().asSeconds() > 5.0f) // if not time yet, exit
+		{
+			if(!audio.streamStateOkay())
+			{
+				audio.stop();
+				audio.initialize();
+				audio.start();
+			}
+			audioStreamCheckClock.restart();
+		}			
+		
 		// run the current MODE selected
 		if     (currentMode==TUNER_MODE)
 			runTuner();
@@ -266,6 +297,10 @@ void GUI::start()
 		else if(currentMode==SETUP_MODE)
 			runSetup();
 	}
+	
+	// EXITING APP...
+	// properly terminate audio device
+	audio.terminate();
 }
 
 // get current directory
@@ -348,33 +383,53 @@ void GUI::runTuner()
 	if(getElapsedTime()>150)
 	{
 		pitch.detect();
-		if(pitch.loudEnough() && pitch.currentNoteNumber > 10)
+		if((pitch.loudEnough() || sameNoteSustaining) && (pitch.currentNoteNumber > 10))
 		{
 			cout << pitch.currentFrequency << "Hz (" << pitch.currentNoteName 
 				<< " " << pitch.currentNoteCenterFrequency << "Hz) AVG " << pitch.getFrequencyAvg() 
 				<< "Hz Div " << (int)(pitch.currentNoteDeltaPercent) << "% (AVG " << pitch.getDeltaPercentAvg() 
 				<< "%) Amp " << (int)pitch.currentPeakAmplitude << " " << pitch.currentNoteNumber 
 				<< endl;
+			
+			if(	( pitch.currentNoteNumber==tunerNoteNumberTracking || 
+				( pitch.currentNoteNumber+12)==tunerNoteNumberTracking ||
+				( pitch.currentNoteNumber-12)==tunerNoteNumberTracking ) )
+					//&& pitch.currentNoteNumber <= 71) // exclude real high pitch case (probably system noise)
+				{
+					sameNoteSustaining = true;
+					
+					// DEBUG
+					if(!pitch.loudEnough())
+						cout << "Under threshold BUT KEEPING THIS ALIVE! :)\n";
+				}
+			else
+				sameNoteSustaining = false;
+
+			tunerNoteNumberTracking = pitch.currentNoteNumber;
 		}
-		restartTimer();
+		else
+		{
+			sameNoteSustaining = false;
+			tunerNoteNumberTracking = 0;
+		}
+
+		// DEBUG
+		if(getElapsedTime()>300)
+			cout << "OVERDUE - took " << getElapsedTime() << " milliseconds\n";
+		
 		tunerStateChanged = true;
+		restartTimer();
 	}
 	else
+	{
 		tunerStateChanged = false;
+	}
 	
 	// determine needle's position - based on the averaged history of note diviation percentage
 	if(tunerStateChanged)
 	{
-
-		// if signal's not loud enough... place at left most position (angle = 180)
-		if(!pitch.loudEnough() || pitch.currentNoteNumber <= 10)
-		{
-			needleRect.setPosition(sf::Vector2f(0,0));
-			needleRect.setOrigin(sf::Vector2f(0,0));
-			needleRect.setRotation(180.0f);
-			needleRect.move(sf::Vector2f(120, 170));				
-		}
-		else // signal IS loud enough, rotate/move the needle to the right position				
+		// if signal IS loud enough, rotate/move the needle to the right position
+		if( (pitch.loudEnough() || sameNoteSustaining) && pitch.currentNoteNumber > 10 )
 		{
 			// needleRect.setSize(sf::Vector2f(80,0));
 			needleRect.setPosition(sf::Vector2f(0,0));
@@ -387,11 +442,15 @@ void GUI::runTuner()
 			needleRect.setRotation(rotationAngle);
 			needleRect.move(sf::Vector2f(120, 170));
 		}
-		
+		// if signal's not loud enough... place at left most position (angle = 180)
+		else
+		{
+			clearTunerDisplayAll();
+		}
 	}
 	
 	// when close to center freq of target note, make background red (using alpha blending)
-	if(tunerStateChanged && pitch.loudEnough() && pitch.currentNoteNumber > 10)
+	if(tunerStateChanged && (pitch.loudEnough() || sameNoteSustaining) && pitch.currentNoteNumber > 10)
 	{
 		double absDiv = abs(pitch.getDeltaPercentAvg());
 		if(absDiv < 8.0)
@@ -410,8 +469,7 @@ void GUI::runTuner()
 	
 	if(tunerStateChanged)
 	{	
-		
-		if(pitch.loudEnough() && pitch.currentNoteNumber > 10)
+		if( (pitch.loudEnough() || sameNoteSustaining) && pitch.currentNoteNumber > 10)
 		{
 			// freqText display size + position might get adjusted, so set default everytime to begin
 			freqText.setCharacterSize(52); // default character size
@@ -463,14 +521,11 @@ void GUI::runTuner()
 			// DEBUG
 			// cout << "rounded freq = " << freq << " int = " << (int)freq << " frac = " << fraqDigit << endl;				
 		}
-		// tunerStateChanged, but not loud enough...
-		else
+		
+		// account for all cases where text should be cleared
+		if((tunerStateChanged) && ((!pitch.loudEnough() && !sameNoteSustaining) || pitch.currentNoteNumber <= 10))
 		{
-			noteNameText.setString("");
-			accidentalText.setString("");
-			freqText.setString("");
-			freqFracText.setString("");
-			backgroundAlpha = 0;
+			clearTunerDisplayAll();
 		}
 		
 	}
@@ -492,6 +547,21 @@ void GUI::runTuner()
 	window.draw(freqFracText);
 	
 	window.display();
+}
+
+void GUI::clearTunerDisplayAll()
+{
+	noteNameText.setString("");
+	accidentalText.setString("");
+	freqText.setString("");
+	freqFracText.setString("");
+	backgroundAlpha = 0;
+	
+	// well it's redundant.. but let's make sure needle stays down
+	needleRect.setPosition(sf::Vector2f(0,0));
+	needleRect.setOrigin(sf::Vector2f(0,0));
+	needleRect.setRotation(180.0f);
+	needleRect.move(sf::Vector2f(120, 170));	
 }
 
 ///////////////////////////////////////////////
@@ -792,6 +862,7 @@ void GUI::runSetup()
 		audio.setRecordingMode();
 		pitch.refresh(); // refresh audio buffer for gentle restarting
 		backgroundAlpha = 0;
+		clearTunerDisplayAll();
 	}
 
 	// process for setup button

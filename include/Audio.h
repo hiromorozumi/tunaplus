@@ -68,6 +68,7 @@ void refresh();
 void stop();
 void terminate();
 void raiseError(PaError e);
+bool streamStateOkay();
 
 };
 
