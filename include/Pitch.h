@@ -51,8 +51,10 @@ public:
 	
 	double fundamentalFreqAtHalf;
 	double fundamentalFreqAtOneThird;
+	double fundamentalFreqAtOneFourth;
 	bool fundamentalFoundAtHalf;
 	bool fundamentalFoundAtOneThird;
+	bool fundamentalFoundAtOneFourth;
 	
 	Pitch();
 	~Pitch(){}

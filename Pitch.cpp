@@ -171,11 +171,17 @@ double Pitch::detect()
 	
 	fundamentalFreqAtHalf = 0;
 	fundamentalFreqAtOneThird = 0;
+	fundamentalFreqAtOneFourth = 0;
 	fundamentalFoundAtHalf = false;
 	fundamentalFoundAtOneThird = false;
+	fundamentalFoundAtOneFourth = false;
 	
-	double divRatio = 1.0;
-	double smallestRatioSoFar = 1.0;
+	double divRatioHalf = 1.0;
+	double smallestRatioSoFarHalf = 1.0;
+	double divRatioOneThird = 1.0;
+	double smallestRatioSoFarOneThird = 1.0;
+	double divRatioOneFourth = 1.0;
+	double smallestRatioSoFarOneFourth = 1.0;
 	
 	// search through biggestEightMagsList
 	for(int i=0; i<8; i++)
@@ -206,26 +212,40 @@ double Pitch::detect()
 		double freqAtThisBinAdjusted = (sampleRate * thisBinNumAdjusted /(double)N );	
 
 		// check 1/2 point for fundamental
-		divRatio = abs((peakFrequency/2.0) - freqAtThisBinAdjusted ) / freqAtThisBinAdjusted;
-		if(divRatio < 0.02 && divRatio > -0.02 && divRatio < smallestRatioSoFar)
+		divRatioHalf = abs((peakFrequency/2.0) - freqAtThisBinAdjusted ) / freqAtThisBinAdjusted;
+		if(divRatioHalf < 0.02 && divRatioHalf > -0.02 && divRatioHalf < smallestRatioSoFarHalf)
 		{
-			smallestRatioSoFar = divRatio;
+			smallestRatioSoFarHalf = divRatioHalf;
 			fundamentalFoundAtHalf = true;
 			fundamentalFreqAtHalf = freqAtThisBinAdjusted;
 		}
 		// check 1/3 point for fundamental
-		divRatio = abs((peakFrequency/3.0) - freqAtThisBinAdjusted ) / freqAtThisBinAdjusted;
-		if(divRatio < 0.02 && divRatio > -0.02 && divRatio < smallestRatioSoFar)
+		divRatioOneThird = abs((peakFrequency/3.0) - freqAtThisBinAdjusted ) / freqAtThisBinAdjusted;
+		if(divRatioOneThird < 0.02 && divRatioOneThird > -0.02 && divRatioOneThird < smallestRatioSoFarOneThird)
 		{
-			smallestRatioSoFar = divRatio;
+			smallestRatioSoFarOneThird = divRatioOneThird;
 			fundamentalFoundAtOneThird = true;
 			fundamentalFreqAtOneThird = freqAtThisBinAdjusted;
-		}			
+		}
+		// check 1/4 point for fundamental
+		divRatioOneFourth = abs((peakFrequency/4.0) - freqAtThisBinAdjusted ) / freqAtThisBinAdjusted;
+		if(divRatioOneFourth < 0.02 && divRatioOneFourth > -0.02 && divRatioOneFourth < smallestRatioSoFarOneFourth)
+		{
+			smallestRatioSoFarOneFourth = divRatioOneFourth;
+			fundamentalFoundAtOneFourth = true;
+			fundamentalFreqAtOneFourth = freqAtThisBinAdjusted;
+		}	
 			
 	}
 	
-	// if indeed there was a strong fundamental at exact half point, rewrite the peakFrequency
-	if(fundamentalFoundAtHalf)
+	// if indeed there was a strong fundamental at exact 1/4 point, 1/2 point, or 1/3 point, rewrite the peakFrequency
+	// Do check in this order - 1/4 point, 1/2 point, 1/3 point
+	if(fundamentalFoundAtOneFourth)
+	{
+		cout << peakFrequency << "Hz, adj w/ fundamental @ 1/4 pt " << fundamentalFreqAtOneFourth << "Hz\n";
+		peakFrequency = fundamentalFreqAtOneFourth;		
+	}
+	else if(fundamentalFoundAtHalf)
 	{
 		cout << peakFrequency << "Hz, adj w/ fundamental @ 1/2 pt " << fundamentalFreqAtHalf << "Hz\n";
 		peakFrequency = fundamentalFreqAtHalf;
@@ -233,7 +253,7 @@ double Pitch::detect()
 	else if(fundamentalFoundAtOneThird) // if not, was 1/3 point good?
 	{
 		cout << peakFrequency << "Hz, adj w/ fundamental @ 1/3 pt " << fundamentalFreqAtOneThird << "Hz\n";
-		peakFrequency = fundamentalFoundAtOneThird;
+		peakFrequency = fundamentalFreqAtOneThird;
 	}
 	
 	// find the closest note and get the diviation amount
